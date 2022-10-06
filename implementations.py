@@ -1,6 +1,6 @@
 import numpy as np
 
-def compute_MSE(y, tx, w):
+def compute_MSE(y, tx, w):                                        #CHECKED
     """Calculate the loss using MSE."""
     # ***************************************************
     """Calculate the loss using MSE
@@ -21,7 +21,7 @@ def compute_MSE(y, tx, w):
     
     # ***************************************************
 
-def compute_gradient(y, tx, w):    # is it obviously only for the MSE?
+def compute_gradient(y, tx, w):    # is it obviously only for the MSE?   # CHECKED THROUGH LAB2 DATA
     """Compute the gradient."""
     # ***************************************************
     """Computes the gradient at w.
@@ -43,10 +43,25 @@ def compute_gradient(y, tx, w):    # is it obviously only for the MSE?
     return gradient
     # ***************************************************
 
-def compute_stoch_gradient(y, tx, w):
+def compute_stoch_gradient(y, tx, w):                               # CHECKED THROUGH LAB2 DATA
     """Compute the stochastic gradient."""
     # ***************************************************
+    """Compute a stochastic gradient at w from just few examples n and their corresponding y_n labels.
+        
+    Args:
+        y: numpy array of shape=(N, )
+        tx: numpy array of shape=(N,D)
+        w: numpy array of shape=(D, ). The vector of model parameters.
+        
+    Returns:
+        A numpy array of shape (D, ) (same shape as w), containing the stochastic gradient of the loss at w.
+    """
+    N = y.shape[0]
+    e_vect = y - np.dot(tx,w)
     
+    stoch_grad = -1/N*np.dot(np.transpose(tx),e_vect)
+    
+    return stoch_grad
     # ***************************************************
     
 def sigmoid(t):
@@ -79,7 +94,7 @@ def compute_ridge_log_gradient(y, tx, w, lambda_):
     return tx.T.dot(sigmoid(tx.dot(w))-y) + 2*lambda_*w
     # ***************************************************
 
-def least_squares_GD(y, tx, initial_w, max_iters, gamma):
+def least_squares_GD(y, tx, initial_w, max_iters, gamma):              # CHECKED THROUGH LAB2 DATA
     """Gradient descent algorithm.""" # for MSE
     # ***************************************************
     """
@@ -102,29 +117,74 @@ def least_squares_GD(y, tx, initial_w, max_iters, gamma):
         
         w = w - gamma*grad;
         loss = compute_MSE(y,tx,w)
-        #print("GD iter. {bi}/{ti}: loss={l}, w0={w0}, w1={w1}".format(
+        #print("GD iter. {bi}/{ti}: loss={l}, w0={w0}, w1={w1}".format(     #uncomment to visualize more info
              # bi=n_iter, ti=max_iters - 1, l=loss, w0=w[0], w1=w[1]))
-       # print("GD norm:", np.linalg.norm(grad))
-
-    if n_iter == max_iters-1:
-        print("The method was stopped by the maximum number of iterations!\n")
+        #print("GD norm:", np.linalg.norm(grad))
         
     return loss, w
     # ***************************************************
 
-def least_squares_SGD(y, tx, initial_w, max_iters, gamma):
-    """Stochastic gradient descent algorithm."""
+def least_squares_SGD(y, tx, initial_w, max_iters, gamma):             # CHECKED THROUGH LAB2 DATA
+    """Stochastic gradient descent algorithm.""" 
     # ***************************************************
+    """The Stochastic Gradient Descent algorithm (SGD).
+            
+    Args:
+        y: numpy array of shape=(N, )
+        tx: numpy array of shape=(N,D)
+        initial_w: numpy array of shape=(D, ). The initial guess (or the initialization) for the model parameters
+        batch_size: a scalar denoting the number of data points in a mini-batch used for computing the stochastic gradient
+        max_iters: a scalar denoting the total number of iterations of SGD
+        gamma: a scalar denoting the stepsize
+        
+    Returns:
+        loss: the loss value (scalar) at w
+        w: the model parameters as a numpy array of shape (D, )
+    """
     
+    # Define parameters to store w and loss
+    
+   
+    w = initial_w
+    
+    for n_iter in range(max_iters):
+        
+        for y_batch, tx_batch in batch_iter(y, tx, batch_size=batch_size, num_batches=1):
+            # compute a stochastic gradient and loss
+            stoch_grad = compute_stoch_gradient(y_batch, tx_batch, w)
+            w = w- gamma*stoch_grad;
+            loss = compute_MSE(y, tx, w)
+            # store w and loss
+        
+       # print("SGD iter. {bi}/{ti}: loss={l}, w0={w0}, w1={w1}".format(
+        #      bi=n_iter, ti=max_iters - 1, l=loss, w0=w[0], w1=w[1]))
+        
     return loss, w
     # ***************************************************
 
 def least_squares(y, tx):
-    """calculate the least squares solution."""
-    # ***************************************************
+    # ***************************************************     # CHECKED THROUGH LAB2 DATA
+    """Calculate the least squares solution.
+       returns loss mse, and optimal weights.
     
-    return loss, w
+    Args:
+        y: numpy array of shape (N,), N is the number of samples.
+        tx: numpy array of shape (N,D), D is the number of features.
+    
+    Returns:
+        w: optimal weights, numpy array of shape(D,), D is the number of features.
+        loss (mse): scalar.
+
+    """
+    N = y.shape[0]
+    gram = np.dot(np.transpose(tx), tx);    # Gram's matrix, for later use
+    w_opt = np.linalg.solve(gram, np.dot(np.transpose(tx), y))
+    e_vect = y - np.dot(tx, w_opt)
+    loss = 1/(2*N)*np.dot(e_vect, e_vect)
+    # returns loss (mse), and optimal weights
     # ***************************************************
+    return loss, w
+
 
 def ridge_regression(y, tx, lambda_):
     """implement ridge regression."""
@@ -156,3 +216,28 @@ def reg_logistic_regression(y, tx, lambda_ , initial_w, max_iters, gamma):
         loss = compute_ridge_log_loss(y, tx, w)
     return loss, w
     # ***************************************************
+    
+def batch_iter(y, tx, batch_size, num_batches=1, shuffle=True):       # Used by least_squares_SGD
+    """
+    Generate a minibatch iterator for a dataset.
+    Takes as input two iterables (here the output desired values 'y' and the input data 'tx')
+    Outputs an iterator which gives mini-batches of `batch_size` matching elements from `y` and `tx`.
+    Data can be randomly shuffled to avoid ordering in the original data messing with the randomness of the minibatches.
+    Example of use :
+    for minibatch_y, minibatch_tx in batch_iter(y, tx, 32):
+        <DO-SOMETHING>
+    """
+    data_size = len(y)
+
+    if shuffle:
+        shuffle_indices = np.random.permutation(np.arange(data_size))
+        shuffled_y = y[shuffle_indices]
+        shuffled_tx = tx[shuffle_indices]
+    else:
+        shuffled_y = y
+        shuffled_tx = tx
+    for batch_num in range(num_batches):
+        start_index = batch_num * batch_size
+        end_index = min((batch_num + 1) * batch_size, data_size)
+        if start_index != end_index:
+            yield shuffled_y[start_index:end_index], shuffled_tx[start_index:end_index]
