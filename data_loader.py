@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import numpy as np
+import pandas as pd
 
 def load_data(file_name):
     """Load training data and id"""
@@ -33,3 +34,15 @@ def load_data(file_name):
 #    ids = all_data[:,0]
 #    data = all_data[:,2:]
 #    return ids, data
+
+def load_training_dataframe():
+    whole_dataframe = pd.read_csv ("train.csv")
+    DER_dataframe = pd.read_csv ("train.csv", usecols=range(0,15))
+    PRI_dataframe = pd.read_csv ("train.csv", usecols=[0,1].append(range(0,15)))
+    return whole_dataframe, DER_dataframe, PRI_dataframe
+    
+def load_test_dataframe():
+    whole_dataframe = pd.read_csv ("test.csv")
+    DER_dataframe = pd.read_csv ("test.csv", usecols=range(0,15))
+    PRI_dataframe = pd.read_csv ("test.csv", usecols=[0,1].append(range(0,15)))
+    return whole_dataframe, DER_dataframe, PRI_dataframe
