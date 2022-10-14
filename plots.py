@@ -1,6 +1,10 @@
 import numpy as np
 import pandas as pd
+import matplotlib as mlp
 import matplotlib.pyplot as plt
+mlp.rc('figure', max_open_warning = 0)
+
+#-----------------------------------------------------------------------------------------------------------
 
 def features_distribution(Names, train_df):
     for name in Names:
@@ -10,6 +14,8 @@ def features_distribution(Names, train_df):
         ax1.set_xlabel(name)
         ax2 = fig.add_subplot(1, 2, 2)
         ax2 = train_df[train_df[name]> -999].boxplot(column=name)
+        
+#-----------------------------------------------------------------------------------------------------------
             
 def features_visualization(feature_1, feature_2, train_df, remove_outliers=True):
     fig = plt.figure()

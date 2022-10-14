@@ -2,8 +2,7 @@
 import numpy as np
 import pandas as pd
 
-def load_data(file_name):
-    """Load training data and id"""
+"""def load_data(file_name):
     path_dataset = file_name
     all_data = np.genfromtxt(path_dataset, delimiter=",", skip_header=1,  usecols= \
                              (0,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30) ) #stupid way, see if you manage to change it
@@ -25,24 +24,19 @@ def load_data(file_name):
     data = np.array(data)
     # predictions = all_data[:,1]  
     # data = all_data[:,2:]
-    return ids, data, pred
+    return ids, data, pred"""
 
-#def load_test_data():
-#    """Load test data and id"""
-#    path_dataset = "test.csv"
-#    all_data = np.genfromtxt(path_dataset, delimiter=",", skip_header=1, usecols=[0, 31])
-#    ids = all_data[:,0]
-#    data = all_data[:,2:]
-#    return ids, data
+#-----------------------------------------------------------------------------------------------------------
 
-def load_training_dataframe():
-    whole_dataframe = pd.read_csv ("train.csv")
-    DER_dataframe = pd.read_csv ("train.csv", usecols=range(0,15))
-    PRI_dataframe = pd.read_csv ("train.csv", usecols=[0,1].append(range(0,15)))
-    return whole_dataframe, DER_dataframe, PRI_dataframe
-    
-def load_test_dataframe():
-    whole_dataframe = pd.read_csv ("test.csv")
-    DER_dataframe = pd.read_csv ("test.csv", usecols=range(0,15))
-    PRI_dataframe = pd.read_csv ("test.csv", usecols=[0,1].append(range(0,15)))
-    return whole_dataframe, DER_dataframe, PRI_dataframe
+def load_data(file_path):
+    df = load_dataframe(file_path)
+    ids = df['Id'].to_numpy(dtype=np.int64)
+    predictions = np.where(df['Prediction']=='s',1,0)
+    data = df.drop(['Id','Prediction'],axis=1).to_numpy()
+    return ids, predictions, data
+
+#-----------------------------------------------------------------------------------------------------------
+
+def load_dataframe(file_path):
+    whole_dataframe = pd.read_csv (file_path)
+    return whole_dataframe
