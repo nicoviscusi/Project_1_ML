@@ -182,7 +182,7 @@ def least_squares_SGD(y, tx, initial_w, max_iters, gamma):
 #-----------------------------------------------------------------------------------------------------------
 
 def least_squares(y, tx):
-    """Calculate the least squares solution.
+    """Calculate the least squares solution through normal equations.
        returns loss mse, and optimal weights.
     
     Args:
@@ -192,9 +192,15 @@ def least_squares(y, tx):
     Returns:
         w: optimal weights, numpy array of shape(D,), D is the number of features.
         loss (mse): scalar."""
-    
+    from numpy.linalg import matrix_rank
     N = y.shape[0]
+    if matrix_rank(tx) != tx.shape[1]:
+        print("X matrix is rank-deficient!")
+        
     gram = np.dot(np.transpose(tx), tx);    # Gram's matrix, for later use
+    print(gram)
+    print(np.dot(np.transpose(tx), y))
+    
     w_opt = np.linalg.solve(gram, np.dot(np.transpose(tx), y))
     e_vect = y - np.dot(tx, w_opt)
     loss = 1/(2*N)*np.dot(e_vect, e_vect)
@@ -211,15 +217,28 @@ def ridge_regression(y, tx, lambda_):
         lambda_: scalar, hyperparameter.
     
     Returns:
-        w: optimal weights, numpy array of shape(D,), D is the number of features.
+        w_ridge: optimal weights, numpy array of shape(D,), D is the number of features.
         loss: scalar, MSE loss function computed with y, tx and w."""
     
     N = y.shape[0]
-    gram = np.dot(np.transpose(tx), tx);    # Gram's matrix, for later use
-    w_opt = np.linalg.solve((gram+2*N*lambda_*np.eye(N)), np.dot(np.transpose(tx), y))
-    e_vect = y - np.dot(tx, w_opt)
-    loss = compute_MSE(y,tx,w)
-    return loss, w
+    D = tx.shape[1]
+    
+    # We will first create the Gram Matrix
+    gram = np.dot(np.transpose(tx), tx)
+    
+    # Now we asssemble the rest of the linear system
+    # First, a recomputation of lambda_ is needed
+    lambdap = 2 * N * lambda_
+    lmatrix = lambdap * np.identity(D)
+    A = np.add(gram, lmatrix)
+    b = np.dot(np.transpose(tx), y)
+    
+    
+    # Now we can solve the linear system
+    w_ridge = np.linalg.solve(A, b)
+    
+    
+    return w_ridge
 
 #-----------------------------------------------------------------------------------------------------------
 
@@ -289,8 +308,7 @@ def build_k_indices(predictions, k_fold, seed):
     interval = int(num_row / k_fold)
     np.random.seed(seed)
     indices = np.random.permutation(num_row)
-    k_indices = [indices[k * interval: (k + 1) * interval]
-                 for k in range(k_fold)]
+    k_indices = [indices[k * interval: (k + 1) * interval] for k in range(k_fold)]
     return np.array(k_indices)
 
 #-----------------------------------------------------------------------------------------------------------
@@ -304,3 +322,4 @@ def cross_validation(predictions, data, k_indices, k):
     training_predictions = np.delete(predictions,k_indices[k],axis=0)
     training_data = np.delete(data,k_indices[k],axis=0)
     return test_predictions, test_data, training_predictions, training_data
+
