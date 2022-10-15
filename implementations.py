@@ -194,17 +194,23 @@ def least_squares(y, tx):
         loss (mse): scalar."""
     from numpy.linalg import matrix_rank
     N = y.shape[0]
-    if matrix_rank(tx) != tx.shape[1]:
-        print("X matrix is rank-deficient!")
+    
         
     gram = np.dot(np.transpose(tx), tx);    # Gram's matrix, for later use
-    print(gram)
-    print(np.dot(np.transpose(tx), y))
     
-    w_opt = np.linalg.solve(gram, np.dot(np.transpose(tx), y))
+    if np.linalg.det(gram) == 0:
+        print("Gram's matrix is singular!")
+    if matrix_rank(tx) != tx.shape[1]:
+        print("X matrix is rank-deficient!")
+    
+    
+    w_opt = np.linalg.lstsq(gram, np.dot(np.transpose(tx), y))[0]
+    w_opt = np.array(w_opt)
+    
+   
     e_vect = y - np.dot(tx, w_opt)
     loss = 1/(2*N)*np.dot(e_vect, e_vect)
-    return loss, w
+    return loss, w_opt
 
 #-----------------------------------------------------------------------------------------------------------
 
@@ -301,7 +307,7 @@ def split_data(data, predictions, ratio, seed):
 
 #-----------------------------------------------------------------------------------------------------------
 
-def build_k_indices(predictions, k_fold, seed):
+def build_k_indices(predictions, k_fold, seed):        # CHECKED
     """build k indices for k-fold."""
     
     num_row = predictions.shape[0]
@@ -316,10 +322,16 @@ def build_k_indices(predictions, k_fold, seed):
 def cross_validation(predictions, data, k_indices, k):
     """return kth test and training sets."""
 
-    k_fold = k_indices.shape[0]
-    test_predictions = predictions[k_indices[k]]
-    test_data = data[k_indices[k],:]
-    training_predictions = np.delete(predictions,k_indices[k],axis=0)
-    training_data = np.delete(data,k_indices[k],axis=0)
-    return test_predictions, test_data, training_predictions, training_data
+    # k_fold = k_indices.shape[0]
+    # test_predictions = predictions[k_indices[k]]
+    # test_data = data[k_indices[k],:]
+    # training_predictions = np.delete(predictions,k_indices[k],axis=0)
+    # training_data = np.delete(data,k_indices[k],axis=0)
+    
+    test_data = data[k_indices[k, :]]
+    train_data = np.delete(data, k_indices[k, :], 0)
+    test_predictions = predictions[k_indices[k, :]]
+    train_predictions = np.delete(predictions, k_indices[k, :], 0)
+    
+    return test_predictions, test_data, train_predictions, train_data
 
