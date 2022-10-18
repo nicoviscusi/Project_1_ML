@@ -175,7 +175,7 @@ def mean_squared_error_gd(y, tx, initial_w, max_iters, gamma):
 
 #-----------------------------------------------------------------------------------------------------------
 
-def mean_squared_error_gd(y, tx, initial_w, max_iters, gamma):
+def mean_squared_error_sgd(y, tx, initial_w, max_iters, gamma):
     """Stochastic gradient descent algorithm.
             
     Args:
