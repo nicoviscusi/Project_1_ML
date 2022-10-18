@@ -55,7 +55,7 @@ def compute_stoch_gradient(y, tx, w):
     
     e_vect = y - tx.dot(w)
     stoch_gradient = -tx.T.dot(e_vect)
-    return gradient
+    return stoch_gradient
 
 #-----------------------------------------------------------------------------------------------------------
     
@@ -226,7 +226,7 @@ def least_squares(y, tx):
     
     a = tx.T.dot(tx)
     b = tx.T.dot(y)
-    w_opt = np.linalg.lstsq(a, b)
+    w_opt = np.linalg.lstsq(a, b)[0]
     loss = compute_MSE(y,tx,w_opt)
     return w_opt, loss
 
@@ -259,7 +259,7 @@ def ridge_regression(y, tx, lambda_):
     
     
     # Now we can solve the linear system
-    w_ridge = np.linalg.solve(a, b)
+    w_ridge = np.linalg.lstsq(a, b)[0]
     loss = compute_MSE(y,tx,w_ridge)
     
     return w_ridge, loss
