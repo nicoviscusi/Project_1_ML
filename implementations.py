@@ -54,7 +54,7 @@ def compute_stoch_gradient(y, tx, w):
         the loss at w."""
     
     e_vect = y - tx.dot(w)
-    stoch_gradient = -1/N*tx.T.dot(e_vect)
+    stoch_gradient = -tx.T.dot(e_vect)
     return gradient
 
 #-----------------------------------------------------------------------------------------------------------
