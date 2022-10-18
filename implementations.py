@@ -86,7 +86,7 @@ def compute_log_loss(y, tx, w):
     N = y.shape[0]
     pred = sigmoid(tx.dot(w))
     loss = -1/N*(y.T.dot(np.log(pred)) + (1 - y).T.dot(np.log(1 - pred)))
-    return loss
+    return loss[0,0]
 
 #-----------------------------------------------------------------------------------------------------------
     
