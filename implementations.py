@@ -216,7 +216,7 @@ def least_squares(y, tx):
         w: optimal weights, numpy array of shape(D,), D is the number of features.
         loss (mse): scalar."""
     from numpy.linalg import matrix_rank   
-    gram = np.dot(np.transpose(tx), tx);    # Gram's matrix, for later use
+    gram = tx.T.dot(tx)  # Gram's matrix, for later use
     
     if np.linalg.det(gram) == 0:
         print("Gram's matrix is singular!")
@@ -224,9 +224,9 @@ def least_squares(y, tx):
         print("X matrix is rank-deficient!")
     
     
-    a = tx.T.dot(tx)
+    a = gram
     b = tx.T.dot(y)
-    w_opt = np.linalg.lstsq(a, b)[0]
+    w_opt = np.linalg.lstsq(a, b, rcond=None)[0]
     loss = compute_MSE(y,tx,w_opt)
     return w_opt, loss
 
@@ -254,12 +254,12 @@ def ridge_regression(y, tx, lambda_):
     # First, a recomputation of lambda_ is needed
     lambdap = 2 * N * lambda_
     lmatrix = lambdap * np.identity(D)
-    a = lambdap + lmatrix
+    a = gram + lmatrix
     b = tx.T.dot(y)
     
     
     # Now we can solve the linear system
-    w_ridge = np.linalg.lstsq(a, b)[0]
+    w_ridge = np.linalg.lstq(a, b, rcond=None)[0]
     loss = compute_MSE(y,tx,w_ridge)
     
     return w_ridge, loss
