@@ -83,9 +83,10 @@ def compute_log_loss(y, tx, w):
     Returns:
        The value of the logistic loss."""
     
+    N = y.shape[0]
     pred = sigmoid(tx.dot(w))
-    loss = y.T.dot(np.log(pred)) + (1 - y).T.dot(np.log(1 - pred))
-    return np.squeeze(- loss)
+    loss = -1/N*(y.T.dot(np.log(pred)) + (1 - y).T.dot(np.log(1 - pred)))
+    return loss
 
 #-----------------------------------------------------------------------------------------------------------
     
@@ -101,23 +102,26 @@ def compute_ridge_log_loss(y, tx, w, lambda_):
     Returns:
        L = the value of the loss (a scalar), corresponding to the input parameters w."""
     
+    N = y.shape[0]
     pred = sigmoid(tx.dot(w))
-    loss = y.T.dot(np.log(pred)) + (1 - y).T.dot(np.log(1 - pred))
-    return np.squeeze(- loss) + lambda_*np.squeeze(w.T.dot(w))
+    loss = -1/N*(y.T.dot(np.log(pred)) + (1 - y).T.dot(np.log(1 - pred)))
+    return loss + lambda_*w.T.dot(w)
 
 #-----------------------------------------------------------------------------------------------------------
 
 def compute_log_gradient(y, tx, w):
     """compute the gradient of negative log likelihood."""
-
-    return tx.T.dot(sigmoid(tx.dot(w))-y)
+    
+    N = y.shape[0]
+    return 1/N*tx.T.dot(sigmoid(tx.dot(w))-y)
     
 #-----------------------------------------------------------------------------------------------------------
     
 def compute_ridge_log_gradient(y, tx, w, lambda_):
     """compute the gradient of negative log likelihood with l2-regularization."""
 
-    return tx.T.dot(sigmoid(tx.dot(w))-y) + 2*lambda_*w
+    N = y.shape[0]
+    return 1/N*tx.T.dot(sigmoid(tx.dot(w))-y) + 2*lambda_*w
 
 #-----------------------------------------------------------------------------------------------------------
 
