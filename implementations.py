@@ -6,28 +6,12 @@ import warnings
 """Some useful functions"""
 #-----------------------------------------------------------------------------------------------------------
 
-def mean_squared_error_gd(y, tx, w):  
+def compute_MSE(y, tx, w):  
     """Calculate the loss using MSE
     
     Args:
         y: numpy array of shape=(N, )
         tx: numpy array of shape=(N,D)
-        w: numpy array of shape=(D,). The vector of model parameters.
-
-    Returns:
-       the value of the loss (a scalar), corresponding to the input parameters w."""
-    
-    e = y - tx.dot(w)
-    return 1/2*np.mean(e**2)
-
-#-----------------------------------------------------------------------------------------------------------
-
-def mean_squared_error_sgd(y, tx, w):
-    """Calculate the loss using MSE
-    
-    Args:
-        y: scalar
-        tx: numpy array of shape=(D,)
         w: numpy array of shape=(D,). The vector of model parameters.
 
     Returns:
@@ -166,7 +150,7 @@ def batch_iter(y, tx, batch_size, num_batches=1, shuffle=True):
 """Implemented methods"""
 #-----------------------------------------------------------------------------------------------------------
 
-def least_squares_GD(y, tx, initial_w, max_iters, gamma):              
+def mean_squared_error_gd(y, tx, initial_w, max_iters, gamma):              
     """Gradient descent algorithm for MSE.
     
     Args:
@@ -186,12 +170,12 @@ def least_squares_GD(y, tx, initial_w, max_iters, gamma):
     for n_iter in range(max_iters):
         grad = compute_gradient(y, tx, w)
         w = w - gamma*grad;
-        loss = mean_squared_error_gd(y,tx,w)
+        loss = compute_MSE(y,tx,w)
     return loss, w
 
 #-----------------------------------------------------------------------------------------------------------
 
-def least_squares_SGD(y, tx, initial_w, max_iters, gamma):
+def mean_squared_error_gd(y, tx, initial_w, max_iters, gamma):
     """Stochastic gradient descent algorithm.
             
     Args:
@@ -214,7 +198,7 @@ def least_squares_SGD(y, tx, initial_w, max_iters, gamma):
             # compute a stochastic gradient and loss
             stoch_grad = compute_stoch_gradient(y_batch, tx_batch, w)
             w = w- gamma*stoch_grad;
-            loss = mean_squared_error_sgd(y, tx, w)
+            loss = compute_MSE(y, tx, w)
             # store w and loss     
     return loss, w
 
@@ -243,7 +227,7 @@ def least_squares(y, tx):
     a = tx.T.dot(tx)
     b = tx.T.dot(y)
     w_opt = np.linalg.solve(a, b)
-    loss = mean_squared_error_gd(y,tx,w_opt)
+    loss = compute_MSE(y,tx,w_opt)
     return loss, w_opt
 
 #-----------------------------------------------------------------------------------------------------------
@@ -276,7 +260,7 @@ def ridge_regression(y, tx, lambda_):
     
     # Now we can solve the linear system
     w_ridge = np.linalg.solve(a, b)
-    loss = mean_squared_error_gd(y,tx,w_ridge)
+    loss = compute_MSE(y,tx,w_ridge)
     
     return loss, w_ridge
 
