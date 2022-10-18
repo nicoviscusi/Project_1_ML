@@ -259,7 +259,7 @@ def ridge_regression(y, tx, lambda_):
     
     
     # Now we can solve the linear system
-    w_ridge = np.linalg.lstsq(a, b)[0]
+    w_ridge = np.linalg.solve(a, b)
     loss = compute_MSE(y,tx,w_ridge)
     
     return w_ridge, loss
