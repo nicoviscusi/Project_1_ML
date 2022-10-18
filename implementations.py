@@ -1,12 +1,12 @@
 import numpy as np
 import warnings
-warnings.filterwarnings('ignore')
+#warnings.filterwarnings('ignore')
 
 #-----------------------------------------------------------------------------------------------------------
 """Some useful functions"""
 #-----------------------------------------------------------------------------------------------------------
 
-def compute_MSE(y, tx, w):  
+def mean_squared_error_gd(y, tx, w):  
     """Calculate the loss using MSE
     
     Args:
@@ -15,13 +15,26 @@ def compute_MSE(y, tx, w):
         w: numpy array of shape=(D,). The vector of model parameters.
 
     Returns:
-       L = the value of the loss (a scalar), corresponding to the input parameters w."""
+       the value of the loss (a scalar), corresponding to the input parameters w."""
     
-    N = y.shape[0]
-    e_vect = y - np.dot(tx,w)
-    #expression of the MSE cost function with the error vector
-    L = 1/(2*N)*np.dot(e_vect,e_vect)
-    return L
+    e = y - tx.dot(w)
+    return 1/2*np.mean(e**2)
+
+#-----------------------------------------------------------------------------------------------------------
+
+def mean_squared_error_sgd(y, tx, w):
+    """Calculate the loss using MSE
+    
+    Args:
+        y: scalar
+        tx: numpy array of shape=(D,)
+        w: numpy array of shape=(D,). The vector of model parameters.
+
+    Returns:
+       the value of the loss (a scalar), corresponding to the input parameters w."""
+    
+    e = y - tx.dot(w)
+    return 1/2*np.mean(e**2)
 
 #-----------------------------------------------------------------------------------------------------------
 
@@ -38,8 +51,8 @@ def compute_gradient(y, tx, w):
         the loss at w."""
     
     N = y.shape[0]
-    e_vect = y - np.dot(tx,w) 
-    gradient = -1/N*np.dot(np.transpose(tx),e_vect)
+    e_vect = y - tx.dot(w)
+    gradient = -1/N*tx.T.dot(e_vect)
     return gradient
 
 #-----------------------------------------------------------------------------------------------------------
@@ -48,39 +61,65 @@ def compute_stoch_gradient(y, tx, w):
     """Compute a stochastic gradient at w from just few examples n and their corresponding y_n labels.
         
     Args:
-        y: numpy array of shape=(N, )
-        tx: numpy array of shape=(N,D)
+        y: scalar
+        tx: numpy array of shape=(D, )
         w: numpy array of shape=(D, ). The vector of model parameters.
         
     Returns:
         A numpy array of shape (D, ) (same shape as w), containing the stochastic gradient of
         the loss at w."""
     
-    N = y.shape[0]
-    e_vect = y - np.dot(tx,w)
-    stoch_grad = -1/N*np.dot(np.transpose(tx),e_vect)
-    return stoch_grad
+    e_vect = y - tx.dot(w)
+    stoch_gradient = -1/N*tx.T.dot(e_vect)
+    return gradient
 
 #-----------------------------------------------------------------------------------------------------------
     
 def sigmoid(t):
-    """apply the sigmoid function on t."""
+    """apply the sigmoid function on t.
+    
+    Args:
+        t: scalar 
+
+    Returns:
+       The value of the sigmoid function defined at t."""
     
     return (1 + np.exp(-t))**(-1)
 
 #-----------------------------------------------------------------------------------------------------------
 
 def compute_log_loss(y, tx, w):
-    """compute the 'logistic' loss: negative log likelihood."""
+    """compute the 'logistic' loss: negative log likelihood.
+    
+    Args:
+        y: numpy array of shape=(N, )
+        tx: numpy array of shape=(N,D)
+        w: numpy array of shape=(D,). The vector of model parameters.
 
-    return np.sum(np.log(1+np.exp(tx.dot(w)))) - (y.T).dot(tx.dot(w))
+    Returns:
+       The value of the logistic loss."""
+    
+    pred = sigmoid(tx.dot(w))
+    loss = y.T.dot(np.log(pred)) + (1 - y).T.dot(np.log(1 - pred))
+    return np.squeeze(- loss)
 
 #-----------------------------------------------------------------------------------------------------------
     
 def compute_ridge_log_loss(y, tx, w, lambda_):
-    """compute the 'logistic' loss with l2-regularization: negative log likelihood."""
+    """compute the 'logistic' loss with l2-regularization: negative log likelihood.
     
-    return np.sum(np.log(1+np.exp(tx.dot(w)))) - (y.T).dot(tx.dot(w)) + lambda_*w.T.dot(w)
+    Args:
+        y: numpy array of shape=(N, )
+        tx: numpy array of shape=(N,D)
+        w: numpy array of shape=(D,). The vector of model parameters.
+        lambda_: L2-regularization constant
+
+    Returns:
+       L = the value of the loss (a scalar), corresponding to the input parameters w."""
+    
+    pred = sigmoid(tx.dot(w))
+    loss = y.T.dot(np.log(pred)) + (1 - y).T.dot(np.log(1 - pred))
+    return np.squeeze(- loss) + lambda_*np.squeeze(w.T.dot(w))
 
 #-----------------------------------------------------------------------------------------------------------
 
@@ -147,7 +186,7 @@ def least_squares_GD(y, tx, initial_w, max_iters, gamma):
     for n_iter in range(max_iters):
         grad = compute_gradient(y, tx, w)
         w = w - gamma*grad;
-        loss = compute_MSE(y,tx,w)
+        loss = mean_squared_error_gd(y,tx,w)
     return loss, w
 
 #-----------------------------------------------------------------------------------------------------------
@@ -175,7 +214,7 @@ def least_squares_SGD(y, tx, initial_w, max_iters, gamma):
             # compute a stochastic gradient and loss
             stoch_grad = compute_stoch_gradient(y_batch, tx_batch, w)
             w = w- gamma*stoch_grad;
-            loss = compute_MSE(y, tx, w)
+            loss = mean_squared_error_sgd(y, tx, w)
             # store w and loss     
     return loss, w
 
@@ -192,10 +231,7 @@ def least_squares(y, tx):
     Returns:
         w: optimal weights, numpy array of shape(D,), D is the number of features.
         loss (mse): scalar."""
-    from numpy.linalg import matrix_rank
-    N = y.shape[0]
-    
-        
+    from numpy.linalg import matrix_rank   
     gram = np.dot(np.transpose(tx), tx);    # Gram's matrix, for later use
     
     if np.linalg.det(gram) == 0:
@@ -204,12 +240,10 @@ def least_squares(y, tx):
         print("X matrix is rank-deficient!")
     
     
-    w_opt = np.linalg.lstsq(gram, np.dot(np.transpose(tx), y))[0]
-    w_opt = np.array(w_opt)
-    
-   
-    e_vect = y - np.dot(tx, w_opt)
-    loss = 1/(2*N)*np.dot(e_vect, e_vect)
+    a = tx.T.dot(tx)
+    b = tx.T.dot(y)
+    w_opt = np.linalg.solve(a, b)
+    loss = mean_squared_error_gd(y,tx,w_opt)
     return loss, w_opt
 
 #-----------------------------------------------------------------------------------------------------------
@@ -230,31 +264,30 @@ def ridge_regression(y, tx, lambda_):
     D = tx.shape[1]
     
     # We will first create the Gram Matrix
-    gram = np.dot(np.transpose(tx), tx)
+    gram = tx.T.dot(tx)
     
     # Now we asssemble the rest of the linear system
     # First, a recomputation of lambda_ is needed
     lambdap = 2 * N * lambda_
     lmatrix = lambdap * np.identity(D)
-    A = np.add(gram, lmatrix)
-    b = np.dot(np.transpose(tx), y)
+    a = lambdap + lmatrix
+    b = tx.T.dot(y)
     
     
     # Now we can solve the linear system
-    w_ridge = np.linalg.solve(A, b)
+    w_ridge = np.linalg.solve(a, b)
+    loss = mean_squared_error_gd(y,tx,w_ridge)
     
-    
-    return w_ridge
+    return loss, w_ridge
 
 #-----------------------------------------------------------------------------------------------------------
 
 def logistic_regression(y, tx, initial_w, max_iters, gamma):
     """implement logistic regression."""
-
+    
     losses = []
     threshold = 1e-18
     w = initial_w
-    loss = compute_log_loss(y, tx, w)
     for n_iter in range(max_iters):
         gradient = compute_log_gradient(y, tx, w)
         w = w - gamma*gradient
@@ -328,10 +361,14 @@ def cross_validation(predictions, data, k_indices, k):
     # training_predictions = np.delete(predictions,k_indices[k],axis=0)
     # training_data = np.delete(data,k_indices[k],axis=0)
     
-    test_data = data[k_indices[k, :]]
-    train_data = np.delete(data, k_indices[k, :], 0)
-    test_predictions = predictions[k_indices[k, :]]
-    train_predictions = np.delete(predictions, k_indices[k, :], 0)
+    te_indice = k_indices[k]
+    tr_indice = k_indices[~(np.arange(k_indices.shape[0]) == k)]
+    tr_indice = tr_indice.reshape(-1)
+
+    test_predictions = predictions[te_indice]
+    train_predictions = predictions[tr_indice]
+    test_data = data[te_indice]
+    train_data = data[tr_indice]
     
     return test_predictions, test_data, train_predictions, train_data
 
