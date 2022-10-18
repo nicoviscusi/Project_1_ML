@@ -167,11 +167,12 @@ def mean_squared_error_gd(y, tx, initial_w, max_iters, gamma):
         for each iteration of GD."""
     
     w = initial_w
+    loss = compute_MSE(y,tx,w)
     for n_iter in range(max_iters):
         grad = compute_gradient(y, tx, w)
         w = w - gamma*grad;
         loss = compute_MSE(y,tx,w)
-    return loss, w
+    return w, loss
 
 #-----------------------------------------------------------------------------------------------------------
 
@@ -183,8 +184,6 @@ def mean_squared_error_sgd(y, tx, initial_w, max_iters, gamma):
         tx: numpy array of shape=(N,D)
         initial_w: numpy array of shape=(D, ). The initial guess (or the initialization)
         for the model parameters
-        batch_size: a scalar denoting the number of data points in a mini-batch used for computing
-        the stochastic gradient
         max_iters: a scalar denoting the total number of iterations of SGD
         gamma: a scalar denoting the stepsize
         
@@ -193,14 +192,15 @@ def mean_squared_error_sgd(y, tx, initial_w, max_iters, gamma):
         w: the model parameters as a numpy array of shape (D, )."""    
    
     w = initial_w
+    loss = compute_MSE(y,tx,w)
     for n_iter in range(max_iters):
-        for y_batch, tx_batch in batch_iter(y, tx, batch_size=batch_size, num_batches=1):
+        for y_batch, tx_batch in batch_iter(y, tx, batch_size=1):
             # compute a stochastic gradient and loss
             stoch_grad = compute_stoch_gradient(y_batch, tx_batch, w)
             w = w- gamma*stoch_grad;
             loss = compute_MSE(y, tx, w)
             # store w and loss     
-    return loss, w
+    return w, loss
 
 #-----------------------------------------------------------------------------------------------------------
 
@@ -226,9 +226,9 @@ def least_squares(y, tx):
     
     a = tx.T.dot(tx)
     b = tx.T.dot(y)
-    w_opt = np.linalg.solve(a, b)
+    w_opt = np.linalg.lstsq(a, b)
     loss = compute_MSE(y,tx,w_opt)
-    return loss, w_opt
+    return w_opt, loss
 
 #-----------------------------------------------------------------------------------------------------------
 
@@ -262,7 +262,7 @@ def ridge_regression(y, tx, lambda_):
     w_ridge = np.linalg.solve(a, b)
     loss = compute_MSE(y,tx,w_ridge)
     
-    return loss, w_ridge
+    return w_ridge, loss
 
 #-----------------------------------------------------------------------------------------------------------
 
@@ -272,6 +272,7 @@ def logistic_regression(y, tx, initial_w, max_iters, gamma):
     losses = []
     threshold = 1e-18
     w = initial_w
+    loss = compute_log_loss(y, tx, w)
     for n_iter in range(max_iters):
         gradient = compute_log_gradient(y, tx, w)
         w = w - gamma*gradient
@@ -279,7 +280,7 @@ def logistic_regression(y, tx, initial_w, max_iters, gamma):
         losses.append(loss)
         if len(losses) > 1 and np.abs(losses[-1] - losses[-2]) < threshold:
             break
-    return loss, w
+    return w, loss
 
 #-----------------------------------------------------------------------------------------------------------
 
@@ -297,7 +298,7 @@ def reg_logistic_regression(y, tx, lambda_ , initial_w, max_iters, gamma):
         losses.append(loss)
         if len(losses) > 1 and np.abs(losses[-1] - losses[-2]) < threshold:
             break
-    return loss, w
+    return w, loss
 
 #-----------------------------------------------------------------------------------------------------------
 """Cross-validation algorithm"""
