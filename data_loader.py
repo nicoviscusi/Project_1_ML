@@ -26,17 +26,20 @@ import pandas as pd
     # data = all_data[:,2:]
     return ids, data, pred"""
 
-#-----------------------------------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------------------------------------
+
 
 def load_data(file_path):
     df = load_dataframe(file_path)
-    ids = df['Id'].to_numpy(dtype=np.int64)
-    predictions = np.where(df['Prediction']=='s',1,0)
-    data = df.drop(['Id','Prediction'],axis=1).to_numpy()
+    ids = df["Id"].to_numpy(dtype=np.int64)
+    predictions = np.where(df["Prediction"] == "s", 1, 0)
+    data = df.drop(["Id", "Prediction"], axis=1).to_numpy()
     return ids, predictions, data
 
-#-----------------------------------------------------------------------------------------------------------
+
+# -----------------------------------------------------------------------------------------------------------
+
 
 def load_dataframe(file_path):
-    whole_dataframe = pd.read_csv (file_path)
+    whole_dataframe = pd.read_csv(file_path)
     return whole_dataframe

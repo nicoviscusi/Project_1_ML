@@ -1,14 +1,16 @@
 import numpy as np
 import warnings
-#warnings.filterwarnings('ignore')
 
-#-----------------------------------------------------------------------------------------------------------
+# warnings.filterwarnings('ignore')
+
+# -----------------------------------------------------------------------------------------------------------
 """Some useful functions"""
-#-----------------------------------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------------------------------------
 
-def compute_MSE(y, tx, w):  
+
+def compute_MSE(y, tx, w):
     """Calculate the loss using MSE
-    
+
     Args:
         y: numpy array of shape=(N, )
         tx: numpy array of shape=(N,D)
@@ -16,65 +18,73 @@ def compute_MSE(y, tx, w):
 
     Returns:
        the value of the loss (a scalar), corresponding to the input parameters w."""
-    
-    e = y - tx.dot(w)
-    return 1/2*np.mean(e**2)
 
-#-----------------------------------------------------------------------------------------------------------
+    e = y - tx.dot(w)
+    return 1 / 2 * np.mean(e**2)
+
+
+# -----------------------------------------------------------------------------------------------------------
+
 
 def compute_gradient(y, tx, w):
     """Computes the gradient at w.
-        
+
     Args:
         y: numpy array of shape=(N,)
         tx: numpy array of shape=(N,D)
         w: numpy array of shape=(D, ). The vector of model parameters.
-        
+
     Returns:
         gradient = an numpy array of shape (D, ) (same shape as w), containing the gradient of
         the loss at w."""
-    
+
     N = y.shape[0]
     e_vect = y - tx.dot(w)
-    gradient = -1/N*tx.T.dot(e_vect)
+    gradient = -1 / N * tx.T.dot(e_vect)
     return gradient
 
-#-----------------------------------------------------------------------------------------------------------
+
+# -----------------------------------------------------------------------------------------------------------
+
 
 def compute_stoch_gradient(y, tx, w):
     """Compute a stochastic gradient at w from just few examples n and their corresponding y_n labels.
-        
+
     Args:
         y: scalar
         tx: numpy array of shape=(D, )
         w: numpy array of shape=(D, ). The vector of model parameters.
-        
+
     Returns:
         A numpy array of shape (D, ) (same shape as w), containing the stochastic gradient of
         the loss at w."""
-    
+
     e_vect = y - tx.dot(w)
     stoch_gradient = -tx.T.dot(e_vect)
     return stoch_gradient
 
-#-----------------------------------------------------------------------------------------------------------
-    
+
+# -----------------------------------------------------------------------------------------------------------
+
+
 def sigmoid(t):
     """apply the sigmoid function on t.
-    
+
     Args:
-        t: scalar 
+        t: scalar
 
     Returns:
        The value of the sigmoid function defined at t."""
-    
-    return (1 + np.exp(-t))**(-1)
 
-#-----------------------------------------------------------------------------------------------------------
+    return (1 + np.exp(-t)) ** (-1)
+
+
+# -----------------------------------------------------------------------------------------------------------
+
 
 def compute_log_loss(y, tx, w):
     """compute the 'logistic' loss: negative log likelihood.
-    
+
     Args:
         y: numpy array of shape=(N, )
         tx: numpy array of shape=(N,D)
@@ -82,17 +92,19 @@ def compute_log_loss(y, tx, w):
 
     Returns:
        The value of the logistic loss."""
-    
+
     N = y.shape[0]
     pred = sigmoid(tx.dot(w))
-    loss = -1/N*(y.T.dot(np.log(pred)) + (1 - y).T.dot(np.log(1 - pred)))
-    return loss[0,0]
+    loss = -1 / N * (y.T.dot(np.log(pred)) + (1 - y).T.dot(np.log(1 - pred)))
+    return loss[0, 0]
 
-#-----------------------------------------------------------------------------------------------------------
-    
+
+# -----------------------------------------------------------------------------------------------------------
+
+
 def compute_ridge_log_loss(y, tx, w, lambda_):
     """compute the 'logistic' loss with l2-regularization: negative log likelihood.
-    
+
     Args:
         y: numpy array of shape=(N, )
         tx: numpy array of shape=(N,D)
@@ -101,29 +113,35 @@ def compute_ridge_log_loss(y, tx, w, lambda_):
 
     Returns:
        L = the value of the loss (a scalar), corresponding to the input parameters w."""
-    
+
     N = y.shape[0]
     pred = sigmoid(tx.dot(w))
-    loss = -1/N*(y.T.dot(np.log(pred)) + (1 - y).T.dot(np.log(1 - pred)))
-    return (loss)[0,0] # + lambda_*w.T.dot(w))[0,0]
+    loss = -1 / N * (y.T.dot(np.log(pred)) + (1 - y).T.dot(np.log(1 - pred)))
+    return (loss)[0, 0]  # + lambda_*w.T.dot(w))[0,0]
 
-#-----------------------------------------------------------------------------------------------------------
+
+# -----------------------------------------------------------------------------------------------------------
+
 
 def compute_log_gradient(y, tx, w):
     """compute the gradient of negative log likelihood."""
-    
+
     N = y.shape[0]
-    return 1/N*tx.T.dot(sigmoid(tx.dot(w))-y)
-    
-#-----------------------------------------------------------------------------------------------------------
-    
+    return 1 / N * tx.T.dot(sigmoid(tx.dot(w)) - y)
+
+
+# -----------------------------------------------------------------------------------------------------------
+
+
 def compute_ridge_log_gradient(y, tx, w, lambda_):
     """compute the gradient of negative log likelihood with l2-regularization."""
 
     N = y.shape[0]
-    return 1/N*tx.T.dot(sigmoid(tx.dot(w))-y) + 2*lambda_*w
+    return 1 / N * tx.T.dot(sigmoid(tx.dot(w)) - y) + 2 * lambda_ * w
 
-#-----------------------------------------------------------------------------------------------------------
+
+# -----------------------------------------------------------------------------------------------------------
+
 
 def batch_iter(y, tx, batch_size, num_batches=1, shuffle=True):
     """Generate a minibatch iterator for a dataset.
@@ -133,8 +151,8 @@ def batch_iter(y, tx, batch_size, num_batches=1, shuffle=True):
     the randomness of the minibatches.
     Example of use :
     for minibatch_y, minibatch_tx in batch_iter(y, tx, 32):
-        <DO-SOMETHING> """
-    
+        <DO-SOMETHING>"""
+
     data_size = len(y)
 
     if shuffle:
@@ -150,13 +168,15 @@ def batch_iter(y, tx, batch_size, num_batches=1, shuffle=True):
         if start_index != end_index:
             yield shuffled_y[start_index:end_index], shuffled_tx[start_index:end_index]
 
-#-----------------------------------------------------------------------------------------------------------
-"""Implemented methods"""
-#-----------------------------------------------------------------------------------------------------------
 
-def mean_squared_error_gd(y, tx, initial_w, max_iters, gamma):              
+# -----------------------------------------------------------------------------------------------------------
+"""Implemented methods"""
+# -----------------------------------------------------------------------------------------------------------
+
+
+def mean_squared_error_gd(y, tx, initial_w, max_iters, gamma):
     """Gradient descent algorithm for MSE.
-    
+
     Args:
         y: numpy array of shape=(N, )
         tx: numpy array of shape=(N,D)
@@ -164,25 +184,27 @@ def mean_squared_error_gd(y, tx, initial_w, max_iters, gamma):
         for the model parameters
         max_iters: a scalar denoting the total number of iterations of GD
         gamma: a scalar denoting the stepsize
-        
+
     Returns:
         loss: the loss value (scalar) for the best w found
         w: a list of length max_iters containing the model parameters as numpy arrays of shape (2, ),
         for each iteration of GD."""
-    
+
     w = initial_w
-    loss = compute_MSE(y,tx,w)
+    loss = compute_MSE(y, tx, w)
     for n_iter in range(max_iters):
         grad = compute_gradient(y, tx, w)
-        w = w - gamma*grad;
-        loss = compute_MSE(y,tx,w)
+        w = w - gamma * grad
+        loss = compute_MSE(y, tx, w)
     return w, loss
 
-#-----------------------------------------------------------------------------------------------------------
+
+# -----------------------------------------------------------------------------------------------------------
+
 
 def mean_squared_error_sgd(y, tx, initial_w, max_iters, gamma):
     """Stochastic gradient descent algorithm.
-            
+
     Args:
         y: numpy array of shape=(N, )
         tx: numpy array of shape=(N,D)
@@ -190,105 +212,112 @@ def mean_squared_error_sgd(y, tx, initial_w, max_iters, gamma):
         for the model parameters
         max_iters: a scalar denoting the total number of iterations of SGD
         gamma: a scalar denoting the stepsize
-        
+
     Returns:
         loss: the loss value (scalar) at w
-        w: the model parameters as a numpy array of shape (D, )."""    
-   
+        w: the model parameters as a numpy array of shape (D, )."""
+
     w = initial_w
-    loss = compute_MSE(y,tx,w)
+    loss = compute_MSE(y, tx, w)
     for n_iter in range(max_iters):
         for y_batch, tx_batch in batch_iter(y, tx, batch_size=1):
             # compute a stochastic gradient and loss
             stoch_grad = compute_stoch_gradient(y_batch, tx_batch, w)
-            w = w- gamma*stoch_grad;
+            w = w - gamma * stoch_grad
             loss = compute_MSE(y, tx, w)
-            # store w and loss     
+            # store w and loss
     return w, loss
 
-#-----------------------------------------------------------------------------------------------------------
+
+# -----------------------------------------------------------------------------------------------------------
+
 
 def least_squares(y, tx):
     """Calculate the least squares solution through normal equations.
        returns loss mse, and optimal weights.
-    
+
     Args:
         y: numpy array of shape (N,), N is the number of samples.
         tx: numpy array of shape (N,D), D is the number of features.
-    
+
     Returns:
         w: optimal weights, numpy array of shape(D,), D is the number of features.
         loss (mse): scalar."""
-    from numpy.linalg import matrix_rank   
+    from numpy.linalg import matrix_rank
+
     gram = tx.T.dot(tx)  # Gram's matrix, for later use
-    
+
     if np.linalg.det(gram) == 0:
         print("Gram's matrix is singular!")
     if matrix_rank(tx) != tx.shape[1]:
         print("X matrix is rank-deficient!")
-    
-    
+
     a = gram
     b = tx.T.dot(y)
     w_opt = np.linalg.lstsq(a, b, rcond=None)[0]
-    loss = compute_MSE(y,tx,w_opt)
+    loss = compute_MSE(y, tx, w_opt)
     return w_opt, loss
 
-#-----------------------------------------------------------------------------------------------------------
+
+# -----------------------------------------------------------------------------------------------------------
+
 
 def ridge_regression(y, tx, lambda_):
     """Calculate the ridge regression.
-    
+
     Args:
         y: numpy array of shape (N,), N is the number of samples.
         tx: numpy array of shape (N,D), D is the number of features.
         lambda_: scalar, hyperparameter.
-    
+
     Returns:
         w_ridge: optimal weights, numpy array of shape(D,), D is the number of features.
         loss: scalar, MSE loss function computed with y, tx and w."""
-    
+
     N = y.shape[0]
     D = tx.shape[1]
-    
+
     # We will first create the Gram Matrix
     gram = tx.T.dot(tx)
-    
+
     # Now we asssemble the rest of the linear system
     # First, a recomputation of lambda_ is needed
     lambdap = 2 * N * lambda_
     lmatrix = lambdap * np.identity(D)
     a = gram + lmatrix
     b = tx.T.dot(y)
-    
-    
+
     # Now we can solve the linear system
     w_ridge = np.linalg.lstsq(a, b, rcond=None)[0]
-    loss = compute_MSE(y,tx,w_ridge)
-    
+    loss = compute_MSE(y, tx, w_ridge)
+
     return w_ridge, loss
 
-#-----------------------------------------------------------------------------------------------------------
+
+# -----------------------------------------------------------------------------------------------------------
+
 
 def logistic_regression(y, tx, initial_w, max_iters, gamma):
     """implement logistic regression."""
-    
+
     losses = []
     threshold = 1e-18
     w = initial_w
     loss = compute_log_loss(y, tx, w)
     for n_iter in range(max_iters):
         gradient = compute_log_gradient(y, tx, w)
-        w = w - gamma*gradient
+        w = w - gamma * gradient
         loss = compute_log_loss(y, tx, w)
         losses.append(loss)
         if len(losses) > 1 and np.abs(losses[-1] - losses[-2]) < threshold:
             break
     return w, loss
 
-#-----------------------------------------------------------------------------------------------------------
 
-def reg_logistic_regression(y, tx, lambda_ , initial_w, max_iters, gamma):
+# -----------------------------------------------------------------------------------------------------------
+
+
+def reg_logistic_regression(y, tx, lambda_, initial_w, max_iters, gamma):
     """implement logistic regression with l2-regularization."""
 
     losses = []
@@ -297,49 +326,60 @@ def reg_logistic_regression(y, tx, lambda_ , initial_w, max_iters, gamma):
     loss = compute_ridge_log_loss(y, tx, w, lambda_)
     for n_iter in range(max_iters):
         gradient = compute_ridge_log_gradient(y, tx, w, lambda_)
-        w = w - gamma*gradient
-        loss = compute_ridge_log_loss(y, tx, w,lambda_)
+        w = w - gamma * gradient
+        loss = compute_ridge_log_loss(y, tx, w, lambda_)
         losses.append(loss)
         if len(losses) > 1 and np.abs(losses[-1] - losses[-2]) < threshold:
             break
     return w, loss
 
-#-----------------------------------------------------------------------------------------------------------
+
+# -----------------------------------------------------------------------------------------------------------
 """Cross-validation algorithm"""
-#-----------------------------------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------------------------------------
+
 
 def split_data(data, predictions, ratio, seed):
-    """split the dataset based on the split ratio. If ratio is 0.8 
-    you will have 80% of your data set dedicated to training 
+    """split the dataset based on the split ratio. If ratio is 0.8
+    you will have 80% of your data set dedicated to training
     and the rest dedicated to testing."""
     training_y = []
     training_x = []
     test_y = []
     test_x = []
     np.random.seed(seed)
-    for i in range(0,len(predictions)):
-        j = np.random.uniform(0,1)
+    for i in range(0, len(predictions)):
+        j = np.random.uniform(0, 1)
         if j < ratio:
             training_y.append(predictions[i])
-            training_x.append(data[i,:])
+            training_x.append(data[i, :])
         else:
             test_y.append(predictions[i])
-            test_x.append(data[i,:])
-    return np.array(training_y), np.array(training_x), np.array(test_y), np.array(test_x)
+            test_x.append(data[i, :])
+    return (
+        np.array(training_y),
+        np.array(training_x),
+        np.array(test_y),
+        np.array(test_x),
+    )
 
-#-----------------------------------------------------------------------------------------------------------
 
-def build_k_indices(predictions, k_fold, seed):        # CHECKED
+# -----------------------------------------------------------------------------------------------------------
+
+
+def build_k_indices(predictions, k_fold, seed):  # CHECKED
     """build k indices for k-fold."""
-    
+
     num_row = predictions.shape[0]
     interval = int(num_row / k_fold)
     np.random.seed(seed)
     indices = np.random.permutation(num_row)
-    k_indices = [indices[k * interval: (k + 1) * interval] for k in range(k_fold)]
+    k_indices = [indices[k * interval : (k + 1) * interval] for k in range(k_fold)]
     return np.array(k_indices)
 
-#-----------------------------------------------------------------------------------------------------------
+
+# -----------------------------------------------------------------------------------------------------------
+
 
 def cross_validation(predictions, data, k_indices, k):
     """return kth test and training sets."""
@@ -349,7 +389,7 @@ def cross_validation(predictions, data, k_indices, k):
     # test_data = data[k_indices[k],:]
     # training_predictions = np.delete(predictions,k_indices[k],axis=0)
     # training_data = np.delete(data,k_indices[k],axis=0)
-    
+
     te_indice = k_indices[k]
     tr_indice = k_indices[~(np.arange(k_indices.shape[0]) == k)]
     tr_indice = tr_indice.reshape(-1)
@@ -358,6 +398,5 @@ def cross_validation(predictions, data, k_indices, k):
     train_predictions = predictions[tr_indice]
     test_data = data[te_indice]
     train_data = data[tr_indice]
-    
-    return test_predictions, test_data, train_predictions, train_data
 
+    return test_predictions, test_data, train_predictions, train_data
