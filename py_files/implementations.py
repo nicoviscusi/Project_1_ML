@@ -123,14 +123,14 @@ def compute_ridge_log_loss(y, tx, w, lambda_):
         lambda_: L2-regularization constant
 
     Returns:
-       the value of the loss (a scalar), the value of negative log likelihood for logistic regression 
+       the value of the loss (a scalar), the value of negative log likelihood for logistic regression
        with regularization term lambda_*w.T.dot(w)
     """
 
     N = y.shape[0]
     pred = sigmoid(tx.dot(w))
     loss = -1 / N * (y.T.dot(np.log(pred)) + (1 - y).T.dot(np.log(1 - pred)))
-    return loss  + lambda_*w.T.dot(w)
+    return loss + lambda_ * w.T.dot(w)
 
 
 # -----------------------------------------------------------------------------------------------------------
@@ -139,7 +139,7 @@ def compute_ridge_log_loss(y, tx, w, lambda_):
 def compute_log_gradient(y, tx, w):
     """
     compute the gradient of negative log likelihood.
-    
+
     Args:
         y: numpy array of shape=(N,)
         tx: numpy array of shape=(N,D)
@@ -159,7 +159,7 @@ def compute_log_gradient(y, tx, w):
 def compute_ridge_log_gradient(y, tx, w, lambda_):
     """
     compute the gradient of negative log likelihood with l2-regularization.
-    
+
     Args:
         y: numpy array of shape=(N,)
         tx: numpy array of shape=(N,D)
@@ -285,7 +285,7 @@ def least_squares(y, tx):
         w: optimal weights, numpy array of shape(D,), D is the number of features.
         loss (mse): scalar.
     """
-    
+
     gram = tx.T.dot(tx)  # Gram's matrix, for later use
     a = gram
     b = tx.T.dot(y)
@@ -349,7 +349,7 @@ def logistic_regression(y, tx, initial_w, max_iters, gamma):
         w_ridge: optimal weights, numpy array of shape(D,), D is the number of features.
         loss: scalar, negative log likelihood function computed with y, tx and w.
     """
-    
+
     w = initial_w
     loss = compute_log_loss(y, tx, w)
     for n_iter in range(max_iters):
@@ -397,9 +397,9 @@ def split_data(x, y, ratio, seed):
     """
     split the dataset based on the split ratio. If ratio is 0.8
     you will have 80% of your data set dedicated to training
-    and the rest dedicated to testing. In the end, you will get your training 
+    and the rest dedicated to testing. In the end, you will get your training
     and test predictions and data.
-    
+
     Args:
         x: data, a numpy array of shape (N,D)
         y: predictions, a numpy array of shape (N,)
@@ -412,18 +412,18 @@ def split_data(x, y, ratio, seed):
         y_tr: a numpy array of shape (K,)
         y_te: a numpy array of shape (N-K,)
     """
-    
+
     # set seed
     np.random.seed(seed)
     # generate random indices
     num_row = len(y)
     indices = np.random.permutation(num_row)
     index_split = int(np.floor(ratio * num_row))
-    index_tr = indices[: index_split]
+    index_tr = indices[:index_split]
     index_te = indices[index_split:]
     # create split
-    x_tr = x[index_tr,:]
-    x_te = x[index_te,:]
+    x_tr = x[index_tr, :]
+    x_te = x[index_te, :]
     y_tr = y[index_tr]
     y_te = y[index_te]
     return y_tr, x_tr, y_te, x_te
@@ -435,14 +435,14 @@ def split_data(x, y, ratio, seed):
 def build_k_indices(predictions, k_fold, seed):
     """
     build k indices for k-fold.
-    
+
     Args:
         predictions: a numpy array of shape (N,)
         k_fold: scalar, indicating in how many subsets diving the data for cross-validation
         seed: scalar to fix the seed and have reproducible results
 
     Returns:
-       k_indices: an index array  
+       k_indices: an index array
     """
 
     num_row = predictions.shape[0]
@@ -450,7 +450,7 @@ def build_k_indices(predictions, k_fold, seed):
     np.random.seed(seed)
     indices = np.random.permutation(num_row)
     k_indices = [indices[k * interval : (k + 1) * interval] for k in range(k_fold)]
-    
+
     return np.array(k_indices)
 
 
@@ -460,7 +460,7 @@ def build_k_indices(predictions, k_fold, seed):
 def cross_validation(predictions, data, k_indices, k):
     """
     return kth test and training sets for cross-validation.
-    
+
     Args:
         predictions: a numpy array of shape (N,)
         data: a numpy array of shape (N,D)
@@ -478,7 +478,7 @@ def cross_validation(predictions, data, k_indices, k):
     te_indice = k_indices[k]
     tr_indice = k_indices[~(np.arange(k_indices.shape[0]) == k)]
     tr_indice = tr_indice.reshape(-1)
-    
+
     # split the data
     test_predictions = predictions[te_indice]
     train_predictions = predictions[tr_indice]

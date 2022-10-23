@@ -10,10 +10,10 @@ def one_hot_encoding(data):
     that have PRI_JET_NUM set to 0,1,2 respectively and 0 for the rest.
     performs one-hot encoding on the first variable by creating another variable that contains 1 for samples
     that are undefined (-999) and 0 for the rest
-    
+
     Args:
         data: ndarray
-        
+
     Returns:
         data: ndarray after preprocessing
     """
@@ -30,26 +30,26 @@ def one_hot_encoding(data):
 
 def handle_outliers(data):
     """
-    Fore each feature, this function is looking for outliers. 
+    Fore each feature, this function is looking for outliers.
     Outliers in the distribution are defined as such:
     - We first compute the interquartile range defined as IQR = (3rd. quartile - 1st. quartile)
-    - We then define the upper and lower threshold: 
+    - We then define the upper and lower threshold:
       - Lower threshold: 1st. quartile - 3*(IQR)
       - Upper threshold: 3rd. quartile + 3*(IQR)
     - Values are defined as outliers if they are above the upper or below the lower threshold
     After identifying the outlier values, we replace them with the median of the distribution (without
     the undefined values)
     Finally, a vector containing 1 for samples that were defined as outliers and 0 for the rest is added to the
-    data, because we assume that being an outlier might be relevant for determining whether we get a signal or 
+    data, because we assume that being an outlier might be relevant for determining whether we get a signal or
     background noise in the classification task
-    
+
     Args:
         data: ndarray
-        
+
     Returns:
         data: ndarray after preprocessing
-    """  
-    
+    """
+
     for i in range(data.shape[1] - 5):
         data_test = data[data[:, i] > -999, i]
         median = np.median(data_test)
@@ -82,15 +82,15 @@ def handle_undefined_values(data):
     For each feature containing undefined values (-999), the function replaces the undefined values with
     the median of the distribution.
     For variable TOTAL_JET_PT (last variable of the data before preprocessing), we replace the values equal
-    to 0 with the median of the distribution 
-    
+    to 0 with the median of the distribution
+
     Args:
         data: ndarray
-        
+
     Returns:
         data: ndarray after preprocessing
     """
-    
+
     for i in range(data.shape[1] - 6):
         median = np.median(data[data[:, i] > -999, i])
         data[data[:, i] < -998, i] = median
@@ -104,21 +104,21 @@ def handle_undefined_values(data):
 
 def polynomial_2(data):
     """
-    Polynomial feature expansion of degree 2 
+    Polynomial feature expansion of degree 2
     For each feature of the data except the categorical variables, the function will compute its square only.
     We didn't multiply features with each other, because it is computationally expensive
-    
+
     Args:
         data: ndarray
-        
+
     Returns:
         data: ndarray after preprocessing
     """
-    
+
     # in the original data before processing we had 30 features, but we deleted the PRI_JET_NUM (22th.)
     # feature during the one-hot encoding step, explaining why we iterate over the first 29 features
     for i in range(29):
-        data = np.c_[data, data[:,i]**2]
+        data = np.c_[data, data[:, i] ** 2]
     return data
 
 
@@ -129,14 +129,14 @@ def standardize(data):
     """
     Normalization of the data by subtracting each sample value of a non-categoraical feature with its mean
     and diving by the variance
-    
+
     Args:
         data: ndarray
-        
+
     Returns:
         data: ndarray after preprocessing
     """
-    
+
     # in the original data before processing we had 30 features, but we deleted the PRI_JET_NUM (22th.)
     # feature during the one-hot encoding step, explaining we we iterate over the first 29 features. We
     # also standardize the squares of the features, explaining why we iterate a second time from the 49th.
@@ -154,10 +154,10 @@ def standardize(data):
 def ones_concatenate(data):
     """
     Add a column vector of size (N,) with 1 as values (shift term)
-    
+
     Args:
         data: ndarray
-        
+
     Returns:
         data: ndarray after preprocessing
     """

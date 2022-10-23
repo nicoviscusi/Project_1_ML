@@ -20,7 +20,7 @@ def features_visualization(feature_1, feature_2, train_df, remove_outliers=True)
         train_df: pandas dataframe containng the features with their respective names
         remove_outliers: boolean, indicate whether we want to remove undefined values from the scatter plot.
     """
-    
+
     fig = plt.figure()
     ax1 = fig.add_subplot(1, 2, 1)
     new_train_df = train_df
@@ -46,13 +46,13 @@ def features_visualization(feature_1, feature_2, train_df, remove_outliers=True)
     )
     ax1.set_xlabel(feature_1)
     ax1.set_ylabel(feature_2)
-    ax1.legend(loc='upper right')
+    ax1.legend(loc="upper right")
     ax1.grid()
-    
-    
+
+
 # -----------------------------------------------------------------------------------------------------------
 
-    
+
 def plots_distribution_boxplots(Names, train_df):
     """
     Shows distribution and boxplots of a feature specified by its name in a given list
@@ -62,22 +62,22 @@ def plots_distribution_boxplots(Names, train_df):
         Names: list of string, the names of the features we would like to visualize in a
         given dataframe
         train_df: pandas dataframe containng the features with their respective names
-    """  
-    
+    """
+
     # plot the distributions
-    figs, axs = plt.subplots(4,7, figsize=(40,30))
+    figs, axs = plt.subplots(4, 7, figsize=(40, 30))
     for i, name in enumerate(Names):
         axis = axs[np.divmod(i, 7)]
-        axis.hist(train_df[train_df[name] > -999][name],bins=100)
+        axis.hist(train_df[train_df[name] > -999][name], bins=100)
         axis.set_xlabel(name)
-    figs.suptitle('Feature distribution', fontsize=50)
+    figs.suptitle("Feature distribution", fontsize=50)
     plt.savefig("imgs/distributions.png")
-    
+
     # plot the boxplots
-    figs_2, axs_2 = plt.subplots(4,7, figsize=(40,30))
+    figs_2, axs_2 = plt.subplots(4, 7, figsize=(40, 30))
     for i, name in enumerate(Names):
         axis = axs_2[np.divmod(i, 7)]
         axis.boxplot(train_df[train_df[name] > -999][name])
         axis.set_xlabel(name)
-    figs_2.suptitle('Boxplots of features', fontsize=50)
+    figs_2.suptitle("Boxplots of features", fontsize=50)
     plt.savefig("imgs/boxplots.png")
