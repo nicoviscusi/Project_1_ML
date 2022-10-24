@@ -119,7 +119,7 @@ def compute_ridge_log_loss(y, tx, w, lambda_):
     N = y.shape[0]
     pred = sigmoid(tx.dot(w))
     loss = -1 / N * (y.T.dot(np.log(pred)) + (1 - y).T.dot(np.log(1 - pred)))
-    return np.squeeze(loss + lambda_ * w.T.dot(w))
+    return np.squeeze(loss) # + lambda_ * w.T.dot(w))
 
 
 # -----------------------------------------------------------------------------------------------------------
