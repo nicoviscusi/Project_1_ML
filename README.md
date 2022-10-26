@@ -4,10 +4,10 @@
 * [Installation of the repository](#Installation)
 * [Organisation of the repository](#Organisation)
 
-## Description
+## Project description
 Higgs boson events at CERN are registered only through an indirect observation of the decay products of the collision of particles in the so-called LHC experiment. Machine learning techniques have been applied to a data-set of physical values obtained by scientists at CERN, to learn a model that could predict the presence of the Higgs boson during an experiment. In particular, the models used are the least squares regression with gradient descent, stochastic gradient descent and normal equations, ridge regression, and finally two methods for classification: logistic regression and its regularized version.
 
-## Installation
+## Installation of the repository
 To run this repository, please make sure that you have python installed.
 To use the code, please open a terminal, go to your desired directory and clone this repository with (make sure that [GIT](https://git-scm.com/) is installed on your device):
 ```
