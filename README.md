@@ -9,10 +9,11 @@ Higgs boson events at CERN are registered only through an indirect observation o
 
 ## Installation of the repository
 To run this repository, please make sure that you have python installed.
-To use the code, please open a terminal, go to your desired directory and clone this repository with (make sure that [GIT](https://git-scm.com/) is installed on your device):
+To use the code, please open a terminal, go to your desired directory and clone this repository(make sure that [GIT](https://git-scm.com/) is installed on your device). You can use the HTTPS URL as follow: 
 ```
 git clone https://github.com/TitBro/Project_1_ML.git
 ```
+
 ## Organisation of the repository
 This repository consists of 2 directories: 
 
