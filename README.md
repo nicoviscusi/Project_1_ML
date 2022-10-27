@@ -26,5 +26,6 @@ The other files are:
 * run.ipynb: main file where data are loaded, visualized and preprocessed, the functions are loaded and the models are run 
 * implementation.py: file containing the functions of the predictive models to be implemented for this project
 * submission.ipynb: file were submsissions are created
+* tests.ipynb: file containing some basic tests for some implemented functions
 * train.csv: file of the training dataset
 * test.csv: file of the test datatset, which submissions are made with
