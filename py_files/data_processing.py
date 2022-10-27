@@ -3,7 +3,7 @@ import numpy as np
 # -----------------------------------------------------------------------------------------------------------
 
 
-def one_hot_encoding(data):
+def one_hot_encoding(data,index=22,num=3):
     """
     performs one-hot encoding on the categorical variable PRI_JET_NUM that stores either 0,1,2,3
     (22th. variable in data array) by creating 3 new variables each containing 1 for samples
@@ -13,15 +13,17 @@ def one_hot_encoding(data):
 
     Args:
         data: ndarray
+        index: index of the feature to one-hot-encode (in our case 22th. feature)
+        num: maximal number of the discrete variable
 
     Returns:
         data: ndarray after preprocessing
     """
-    for i in range(3):
-        data = np.c_[data, np.where(data[:, 22] == i, 1, 0)]
+    for i in range(num):
+        data = np.c_[data, np.where(data[:, index] == i, 1, 0)]
     data = np.c_[data, np.where(data[:, 0] == -999, 1, 0)]
     # deletion of the 22th. variable (PRI_JET_NUM) after performing one-hot encoding
-    data = np.delete(data, 22, 1)
+    data = np.delete(data, index, 1)
     return data
 
 
@@ -77,7 +79,7 @@ def handle_outliers(data):
 # -----------------------------------------------------------------------------------------------------------
 
 
-def handle_undefined_values(data):
+def handle_undefined_values(data, total=True):
     """
     For each feature containing undefined values (-999), the function replaces the undefined values with
     the median of the distribution.
@@ -94,8 +96,9 @@ def handle_undefined_values(data):
     for i in range(data.shape[1] - 6):
         median = np.median(data[data[:, i] > -999, i])
         data[data[:, i] < -998, i] = median
-    median = np.median(data[data[:, data.shape[1] - 6] != 0, data.shape[1] - 6])
-    data[data[:, data.shape[1] - 6] == 0, data.shape[1] - 6] = median
+    if total:
+        median = np.median(data[data[:, data.shape[1] - 6] != 0, data.shape[1] - 6])
+        data[data[:, data.shape[1] - 6] == 0, data.shape[1] - 6] = median
     return data
 
 
