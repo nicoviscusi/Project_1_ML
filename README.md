@@ -24,7 +24,7 @@ This repository consists of 2 directories and others files concerning data and i
 The other files are:
 
 * run.ipynb: main file where data are loaded (with data_loader.py), visualized (with plots.py) and preprocessed (with data_processing.py), the functions are loaded (with implementations.py) and the models are run
-* submission.ipynb: file were submsissions are created (data are loaded with helper.py)
+* submission.ipynb: file were submsissions are created (data are loaded with helper.py): to be run only when run.ipynb has been run !
 * tests.ipynb: file containing some basic tests for some implemented functions (with test_utils.py)
 * implementation.py: file containing the functions of the predictive models to be implemented for this project
 * train.csv: file of the training dataset
