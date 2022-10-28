@@ -20,6 +20,10 @@ This repository consists of 2 directories and others files concerning data and i
 
 * imgs: directory containing all the plots and figures created for this project and included in the report
 * py_files: directory containing all the .py files used by run.ipynb 
+** data_processing.py
+** plots.py
+** data_loader.py
+** test_utils.py
 
 The other files are:
 
