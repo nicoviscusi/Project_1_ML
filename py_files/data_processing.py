@@ -105,11 +105,11 @@ def handle_undefined_values(data, total=True):
 # -----------------------------------------------------------------------------------------------------------
 
 
-def polynomial_2(data):
+def polynomial_expansion(data):
     """
-    Polynomial feature expansion of degree 2
-    For each feature of the data except the categorical variables, the function will compute its square only.
-    We didn't multiply features with each other, because it is computationally expensive
+    Polynomial feature expansion of degree 2 and 3
+    For each feature of the data except the categorical variables, the function will multiply features with each other and
+    also compute their power of 3, we didn't expanded more, because it is computationally expansive.
 
     Args:
         data: ndarray
@@ -121,7 +121,9 @@ def polynomial_2(data):
     # in the original data before processing we had 30 features, but we deleted the PRI_JET_NUM (22th.)
     # feature during the one-hot encoding step, explaining why we iterate over the first 29 features
     for i in range(29):
-        data = np.c_[data, data[:, i] ** 2]
+        data = np.c_[data, data[:, i]**3]
+        for j in range(i,29):
+            data = np.c_[data, data[:, i]*data[:, j]]
     return data
 
 
