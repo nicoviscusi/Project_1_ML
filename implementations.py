@@ -161,7 +161,7 @@ def compute_ridge_log_gradient(y, tx, w, lambda_):
 # -----------------------------------------------------------------------------------------------------------
 
 
-def batch_iter(y, tx, batch_size, num_batches=1, shuffle=True):
+def batch_iter(y, tx, batch_size, num_batches=1, shuffle=True, seed=1):
     """
     Generate a minibatch iterator for a dataset.
     Takes as input two iterables (here the output desired values 'y' and the input data 'tx')
@@ -174,6 +174,7 @@ def batch_iter(y, tx, batch_size, num_batches=1, shuffle=True):
     """
 
     data_size = len(y)
+    np.random.seed(seed)
 
     if shuffle:
         shuffle_indices = np.random.permutation(np.arange(data_size))
