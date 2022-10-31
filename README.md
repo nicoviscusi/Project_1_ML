@@ -13,7 +13,7 @@ To use the code, please open a terminal, go to your desired directory and clone 
 ```
 git clone https://github.com/TitBro/Project_1_ML.git
 ```
-once the repository has been cloned, datasets must be downloaded from AIcrowd and placed in the repository previously installed.
+once the repository has been cloned, datasets must be downloaded from AIcrowd (https://www.aicrowd.com/challenges/epfl-machine-learning-higgs) and placed in the repository previously installed.
 
 ## Organisation of the repository
 This repository consists of 2 directories and others files concerning data and implementation mainly: 
@@ -27,5 +27,3 @@ The other files are:
 * submission.ipynb: file were submsissions are created (data are loaded with helper.py): to be run only when run.ipynb has been run !
 * tests.ipynb: file containing some basic tests for some implemented functions (with test_utils.py)
 * implementation.py: file containing the functions of the predictive models to be implemented for this project
-* train.csv: file of the training dataset
-* test.csv: file of the test datatset, which submissions are made with
